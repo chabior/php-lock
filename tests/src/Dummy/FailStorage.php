@@ -6,11 +6,12 @@ namespace chabior\Lock\Tests\Dummy;
 
 use chabior\Lock\StorageInterface;
 use chabior\Lock\ValueObject\LockName;
+use chabior\Lock\ValueObject\LockTimeout;
 
 class FailStorage implements StorageInterface
 {
 
-    public function acquire(LockName $lockName): void
+    public function acquire(LockName $lockName, LockTimeout $lockTimeout): void
     {
         throw new \RuntimeException(sprintf('Failed to acquire lock %s', $lockName->getName()));
     }

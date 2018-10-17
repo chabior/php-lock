@@ -7,6 +7,7 @@ namespace chabior\Lock;
 use chabior\Lock\Exception\LockException;
 use chabior\Lock\Handler\HandlerInterface;
 use chabior\Lock\ValueObject\LockName;
+use chabior\Lock\ValueObject\LockTimeout;
 
 class Lock
 {
@@ -25,9 +26,15 @@ class Lock
      */
     private $failHandler;
 
-    public function __construct(StorageInterface $storage)
+    /**
+     * @var LockTimeout
+     */
+    private $lockTimeout;
+
+    public function __construct(StorageInterface $storage, LockTimeout $lockTimeout = null)
     {
         $this->storage = $storage;
+        $this->lockTimeout = $lockTimeout;
     }
 
     public function success(HandlerInterface $successHandler): Lock
@@ -54,12 +61,8 @@ class Lock
             throw new \RuntimeException('Fail handler is required');
         }
 
-        if ($this->storage->isLocked($lockName)) {
-            throw new LockException();
-        }
-
         try {
-            $this->storage->acquire($lockName);
+            $this->storage->acquire($lockName, $this->lockTimeout);
         } catch (\Throwable $exception) {
             $this->failHandler->handle($this);
             return;
