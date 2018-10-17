@@ -1,0 +1,15 @@
+{
+  "name": "chabior/php-lock",
+  "description": "Distributed locking mechanism",
+  "type": "library",
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "chabior\\Lock\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.2"
+  }
+}
