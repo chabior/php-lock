@@ -72,7 +72,6 @@ class LockTest extends TestCase
         $lock
             ->success(new CallbackHandler(function () use($name, $storage) {
                 $this::assertTrue($storage->isLocked($name));
-
             }))
             ->fail(new CallbackHandler(function () {
                 throw new AssertionFailedError('Success lock handler called');
@@ -92,7 +91,6 @@ class LockTest extends TestCase
         $lock = $lock
             ->success(new CallbackHandler(function () use($name, $storage) {
                 $this::assertTrue($storage->isLocked($name));
-
             }))
             ->fail(new CallbackHandler(function () {
                 throw new AssertionFailedError('Success lock handler called');
@@ -112,7 +110,6 @@ class LockTest extends TestCase
         $lock = $lock
             ->success(new CallbackHandler(function () use($name, $storage) {
                 $this::assertTrue($storage->isLocked($name));
-
             }))
             ->fail(new CallbackHandler(function () {
                 throw new AssertionFailedError('Success lock handler called');
