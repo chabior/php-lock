@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace chabior\Lock;
 
+use chabior\Lock\Handler\HandlerInterface;
 use chabior\Lock\ValueObject\LockName;
 
 class Lock
@@ -14,12 +15,12 @@ class Lock
     protected $storage;
 
     /**
-     * @var callable
+     * @var HandlerInterface
      */
     private $successHandler;
 
     /**
-     * @var callable
+     * @var HandlerInterface
      */
     private $failHandler;
 
@@ -28,14 +29,14 @@ class Lock
         $this->storage = $storage;
     }
 
-    public function success(callable $successHandler): Lock
+    public function success(HandlerInterface $successHandler): Lock
     {
         $lock = clone $this;
         $lock->successHandler = $successHandler;
         return $lock;
     }
 
-    public function fail(callable $failHandler): Lock
+    public function fail(HandlerInterface $failHandler): Lock
     {
         $lock = clone $this;
         $lock->failHandler = $failHandler;
@@ -55,11 +56,11 @@ class Lock
         try {
             $this->storage->acquire($lockName);
         } catch (\Throwable $exception) {
-            $this->failHandler->__invoke($this);
+            $this->failHandler->handle($this);
             return;
         }
 
-        $this->successHandler->__invoke($this);
+        $this->successHandler->handle($this);
     }
 
     public function release(LockName $lockName): void
