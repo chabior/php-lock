@@ -15,35 +15,35 @@ class LockTest extends TestCase
 {
     public function testLock()
     {
+        $name = new LockName('silly');
         $lock = new Lock(new MemoryStorage());
         $lock
-            ->acquire(new LockName('silly'))
-            ->then(
-                function () use($lock) {
+            ->when(
+                function () use($name) {
                     $this::assertTrue(true);
                 },
                 function () {
-                    throw new AssertionFailedError('Fail handler called!');
+                    throw new AssertionFailedError('Failed handler called');
                 }
             )
-            ->resolve()
+            ->acquire($name)
         ;
     }
 
     public function testFailLock()
     {
+        $name = new LockName('silly');
         $lock = new Lock(new FailStorage());
         $lock
-            ->acquire(new LockName('silly'))
-            ->then(
+            ->when(
                 function () {
-                    throw new AssertionFailedError('Fail handler called!');
+                    throw new AssertionFailedError('Failed handler called');
                 },
                 function () {
                     $this::assertTrue(true);
                 }
             )
-            ->resolve()
+            ->acquire($name)
         ;
     }
 }

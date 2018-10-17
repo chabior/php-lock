@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace chabior\Lock;
 
-use chabior\Lock\ValueObject\LockName;
-
 class Lock
 {
     /**
@@ -18,17 +16,8 @@ class Lock
         $this->storage = $storage;
     }
 
-    public function acquire(LockName $lockName): Promise
+    public function when(callable $successHandler, callable $failHandler): LockHandler
     {
-        return new Promise(function () use($lockName) {
-            $this->storage->acquire($lockName);
-        });
-    }
-
-    public function release(LockName $lockName): Promise
-    {
-        return new Promise(function () use($lockName) {
-            $this->storage->release($lockName);
-        });
+        return new LockHandler($this->storage, $successHandler, $failHandler);
     }
 }
