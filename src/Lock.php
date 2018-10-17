@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace chabior\Lock;
 
+use chabior\Lock\Exception\LockException;
 use chabior\Lock\Handler\HandlerInterface;
 use chabior\Lock\ValueObject\LockName;
 
@@ -51,6 +52,10 @@ class Lock
 
         if ($this->failHandler === null) {
             throw new \RuntimeException('Fail handler is required');
+        }
+
+        if ($this->storage->isLocked($lockName)) {
+            throw new LockException();
         }
 
         try {
