@@ -9,7 +9,15 @@
       "chabior\\Lock\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "chabior\\Lock\\Tests\\": "tests/src/"
+    }
+  },
   "require": {
     "php": "^7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
   }
 }
