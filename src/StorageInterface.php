@@ -11,4 +11,6 @@ interface StorageInterface
     public function acquire(LockName $lockName): void;
 
     public function release(LockName $lockName): void;
+
+    public function isLocked(LockName $lockName): bool;
 }

@@ -19,4 +19,9 @@ class FailStorage implements StorageInterface
     {
         throw new \RuntimeException(sprintf('Failed to release lock %s', $lockName->getName()));
     }
+
+    public function isLocked(LockName $lockName): bool
+    {
+        return false;
+    }
 }

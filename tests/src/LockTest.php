@@ -15,17 +15,16 @@ class LockTest extends TestCase
 {
     public function testLock()
     {
+        $storage = new MemoryStorage();
         $name = new LockName('silly');
-        $lock = new Lock(new MemoryStorage());
+        $lock = new Lock($storage);
         $lock
-            ->when(
-                function () use($name) {
-                    $this::assertTrue(true);
-                },
-                function () {
-                    throw new AssertionFailedError('Failed handler called');
-                }
-            )
+            ->success(function () use ($name, $storage) {
+                $this::assertTrue($storage->isLocked($name));
+            })
+            ->fail(function () {
+                throw new AssertionFailedError('Success lock handler called');
+            })
             ->acquire($name)
         ;
     }
@@ -35,14 +34,30 @@ class LockTest extends TestCase
         $name = new LockName('silly');
         $lock = new Lock(new FailStorage());
         $lock
-            ->when(
-                function () {
-                    throw new AssertionFailedError('Failed handler called');
-                },
-                function () {
-                    $this::assertTrue(true);
-                }
-            )
+            ->success(function () {
+                throw new AssertionFailedError('Fail lock handler called');
+            })
+            ->fail(function () {
+                $this::assertTrue(true);
+            })
+            ->acquire($name)
+        ;
+    }
+
+    public function testReleaseLock()
+    {
+        $storage = new MemoryStorage();
+        $name = new LockName('silly');
+        $lock = new Lock($storage);
+        $lock
+            ->success(function (Lock $lock) use($name, $storage) {
+                $this::assertTrue($storage->isLocked($name));
+                $lock->release($name);
+                $this::assertFalse($storage->isLocked($name));
+            })
+            ->fail(function () {
+                throw new AssertionFailedError('Success lock handler called');
+            })
             ->acquire($name)
         ;
     }
