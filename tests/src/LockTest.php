@@ -154,4 +154,33 @@ class LockTest extends TestCase
         $lock->acquire($name);
         $lock->acquire($name);
     }
+
+    public function testAcquireLockWithoutHandlers()
+    {
+        $this::expectException(\RuntimeException::class);
+        $storage = new MemoryStorage();
+        $name = new LockName('silly');
+        $lock = new Lock($storage, LockTimeout::fromSeconds(1));
+        $lock->acquire($name);
+    }
+
+    public function testAcquireLockWithoutSuccessHandler()
+    {
+        $this::expectException(\RuntimeException::class);
+        $storage = new MemoryStorage();
+        $name = new LockName('silly');
+        $lock = new Lock($storage, LockTimeout::fromSeconds(1));
+        $lock->success(new CallbackHandler(function () {}));
+        $lock->acquire($name);
+    }
+
+    public function testAcquireLockWithoutFailHandler()
+    {
+        $this::expectException(\RuntimeException::class);
+        $storage = new MemoryStorage();
+        $name = new LockName('silly');
+        $lock = new Lock($storage, LockTimeout::fromSeconds(1));
+        $lock->fail(new CallbackHandler(function () {}));
+        $lock->acquire($name);
+    }
 }
