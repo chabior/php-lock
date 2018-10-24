@@ -16,18 +16,33 @@ class LockValid
      */
     private $startDate;
 
-    public function __construct(?LockTimeout $lockTimeout)
+    /**
+     * @var LockValue
+     */
+    private $lockValue;
+
+    public function __construct(LockValue $lockValue, ?LockTimeout $lockTimeout)
     {
         $this->timeout = $lockTimeout;
         $this->startDate = new \DateTimeImmutable();
+        $this->lockValue = $lockValue;
     }
 
-    public function isValid(): bool
+    public function isValid(LockValue $lockValue): bool
     {
+        if (!$this->isValueValid($lockValue)) {
+            return false;
+        }
+
         if (!$this->timeout) {
             return true;
         }
 
         return $this->startDate->modify(sprintf('+ %d seconds', $this->timeout->asSeconds())) > new \DateTimeImmutable();
+    }
+
+    public function isValueValid(LockValue $lockValue): bool
+    {
+        return $lockValue->equals($this->lockValue);
     }
 }

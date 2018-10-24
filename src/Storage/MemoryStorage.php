@@ -14,9 +14,9 @@ use chabior\Lock\ValueObject\LockValue;
 class MemoryStorage implements StorageInterface
 {
     /**
-     * @var array
+     * @var LockValid[]
      */
-    private $isLocked = [];
+    private $locks = [];
 
     public function acquire(LockName $lockName, ?LockTimeout $lockTimeout, LockValue $lockValue): void
     {
@@ -24,25 +24,21 @@ class MemoryStorage implements StorageInterface
             throw new LockException();
         }
 
-        $this->isLocked[$lockName->getName()] = [
-            'timeout' => new LockValid($lockTimeout),
-            'value' => $lockValue,
-        ];
+        $this->locks[$lockName->getName()] = new LockValid($lockValue, $lockTimeout);
     }
 
     public function release(LockName $lockName, LockValue $lockValue): void
     {
-        if (isset($this->isLocked[$lockName->getName()]) && $lockValue->equals($this->isLocked[$lockName->getName()]['value'])) {
-            unset($this->isLocked[$lockName->getName()]);
+        if (isset($this->locks[$lockName->getName()]) && $this->locks[$lockName->getName()]->isValueValid($lockValue)) {
+            unset($this->locks[$lockName->getName()]);
         }
     }
 
     public function isLocked(LockName $lockName, LockValue $lockValue): bool
     {
         return
-            isset($this->isLocked[$lockName->getName()]) &&
-            $this->isLocked[$lockName->getName()]['timeout']->isValid() &&
-            $lockValue->equals($this->isLocked[$lockName->getName()]['value'])
+            isset($this->locks[$lockName->getName()]) &&
+            $this->locks[$lockName->getName()]->isValid($lockValue)
         ;
     }
 }
