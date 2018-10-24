@@ -8,6 +8,7 @@ use chabior\Lock\Exception\LockException;
 use chabior\Lock\Handler\HandlerInterface;
 use chabior\Lock\ValueObject\LockName;
 use chabior\Lock\ValueObject\LockTimeout;
+use chabior\Lock\ValueObject\LockValue;
 
 class Lock
 {
@@ -31,10 +32,16 @@ class Lock
      */
     private $lockTimeout;
 
-    public function __construct(StorageInterface $storage, LockTimeout $lockTimeout = null)
+    /**
+     * @var LockValue
+     */
+    private $lockValue;
+
+    public function __construct(StorageInterface $storage, LockTimeout $lockTimeout = null, LockValue $lockValue = null)
     {
         $this->storage = $storage;
         $this->lockTimeout = $lockTimeout;
+        $this->lockValue = $lockValue ?? LockValue::fromRandomValue();
     }
 
     public function success(HandlerInterface $successHandler): Lock
@@ -62,7 +69,7 @@ class Lock
         }
 
         try {
-            $this->storage->acquire($lockName, $this->lockTimeout);
+            $this->storage->acquire($lockName, $this->lockTimeout, $this->lockValue);
         } catch (\Throwable $exception) {
             $this->failHandler->handle($this);
             return;
@@ -73,6 +80,11 @@ class Lock
 
     public function release(LockName $lockName): void
     {
-        $this->storage->release($lockName);
+        $this->storage->release($lockName, $this->lockValue);
+    }
+
+    public function isLocked(LockName $lockName): bool
+    {
+        return $this->storage->isLocked($lockName, $this->lockValue);
     }
 }
