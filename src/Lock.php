@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace chabior\Lock;
 
-use chabior\Lock\Exception\LockException;
 use chabior\Lock\Handler\HandlerInterface;
+use chabior\Lock\Handler\FailHandlerInterface;
 use chabior\Lock\ValueObject\LockName;
 use chabior\Lock\ValueObject\LockTimeout;
 use chabior\Lock\ValueObject\LockValue;
@@ -23,7 +23,7 @@ class Lock
     private $successHandler;
 
     /**
-     * @var HandlerInterface
+     * @var FailHandlerInterface
      */
     private $failHandler;
 
@@ -51,7 +51,7 @@ class Lock
         return $lock;
     }
 
-    public function fail(HandlerInterface $failHandler): Lock
+    public function fail(FailHandlerInterface $failHandler): Lock
     {
         $lock = clone $this;
         $lock->failHandler = $failHandler;
@@ -71,7 +71,7 @@ class Lock
         try {
             $this->storage->acquire($lockName, $this->lockTimeout, $this->lockValue);
         } catch (\Throwable $exception) {
-            $this->failHandler->handle($this);
+            $this->failHandler->handle($this, $exception);
             return;
         }
 
