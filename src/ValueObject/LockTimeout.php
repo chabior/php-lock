@@ -32,6 +32,11 @@ class LockTimeout
 
     public function asSeconds(): int
     {
-        return (int)ceil($this->timeout / 1000);
+        return (int)round($this->timeout / 1000);
+    }
+
+    public function asMiliSeconds(): int
+    {
+        return $this->timeout;
     }
 }
