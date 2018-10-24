@@ -25,4 +25,9 @@ class LockValue
     {
         return $this->value === $value->value;
     }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 }
